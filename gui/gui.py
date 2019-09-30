@@ -1,7 +1,9 @@
 import sys
 from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QMessageBox, \
-    QLineEdit, QLabel, QVBoxLayout
+    QErrorMessage, QLineEdit, QLabel
 from PyQt5.QtCore import QCoreApplication
+
+from weather_forecast import WeatherForecast
 
 
 class WeatherGui(QWidget):
@@ -11,6 +13,7 @@ class WeatherGui(QWidget):
         self.weather_tb = None
         self.update_btn = None
 
+        self.weather_client = WeatherForecast()
         self.init_ui()
 
     def init_ui(self):
@@ -48,15 +51,17 @@ class WeatherGui(QWidget):
         # self.update_btn.resize(self.update_btn.sizeHint())
         self.update_btn.move(20, 110)
 
-
-        # vbox = QVBoxLayout()
-        # vbox.addWidget(city_lbl)
-        # vbox.addWidget(country_lbl)
-
         self.show()
 
+    def init_location(self):
+        pass
+
     def update_forecast(self):
-        self.weather_tb.setText('sunny')
+        ok, fcast_mess = self.weather_client.get_forecast()
+        if ok:
+            self.weather_tb.setText(fcast_mess)
+        else:
+            QMessageBox.critical(self, 'Error', 'Error: ' + fcast_mess)
 
 
 if __name__ == '__main__':

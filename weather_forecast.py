@@ -11,6 +11,7 @@ class WeatherForecast:
         self.country = 'GB'
         self.weather_data = None
         self.temp_units = 'C'
+        self.resp_error_msg = ''
 
     def get_forecast(self):
         '''
@@ -26,7 +27,8 @@ class WeatherForecast:
                               self.weather_data.description,
                               str(self.weather_data.temp_c) + self.temp_units))
         else:
-            return False, 'Error message'
+            # return False, 'Error message'
+            return False, self.resp_error_msg
 
     def set_location(self, city, country):
         # TODO: Check names here
@@ -41,17 +43,37 @@ class WeatherForecast:
 
     def _http_request(self):
         url = self._url()
-        return requests.get(url)
+        try:
+            return requests.get(url, stream=True, timeout=(10, 10))
+        except requests.exceptions.ConnectTimeout:
+            self.resp_error_msg = 'Connection timeout occurred! ' \
+                                  'Please try later.'
+            return None
+        except requests.exceptions.ReadTimeout:
+            self.resp_error_msg = 'Read timeout occurred! Please try later.'
+            return None
+        except requests.exceptions.ConnectionError:
+            self.resp_error_msg = 'Connection failed. Please try later'
+            return None
+        except requests.exceptions.HTTPError:
+            self.resp_error_msg = 'HTTP Error occurred.'
+            return None
+        except Exception as e:
+            self.resp_error_msg = e
+            return None
 
     def _parse_data_from_request(self):
         # TODO: check response
         response = self._http_request()
-        if response:
+        if response is not None:
             data = json.loads(response.text)
-            temp = data['main']['temp']
-            descript = data['weather'][0]['description']
-
-            return WeatherData(datetime.now(), temp, descript)
+            if response.ok:
+                temp = data['main']['temp']
+                descript = data['weather'][0]['description']
+                return WeatherData(datetime.now(), temp, descript)
+            else:
+                self.resp_error_msg = data['message']
+                return None
         else:
             return None
 
