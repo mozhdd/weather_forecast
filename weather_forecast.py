@@ -14,18 +14,19 @@ class WeatherForecast:
 
     def get_forecast(self):
         '''
-        :return: Weather forecast in string format:
-        '<City>, <Date>, <Clouds>, <Temperature>'
+        :return: Response success (bool), and string message
+        Weather forecast in string format:
+        '<City>, <Date>, <Description>, <Temperature>'
         '''
         self.weather_data = self._parse_data_from_request()
 
         if self.weather_data:
-            return ', '.join((self.city,
+            return True, ', '.join((self.city,
                               self.weather_data.date_str(),
-                              'clouds {:d}%'.format(self.weather_data.clouds),
+                              self.weather_data.description,
                               str(self.weather_data.temp_c) + self.temp_units))
         else:
-            return None
+            return False, 'Error message'
 
     def set_location(self, city, country):
         # TODO: Check names here
@@ -48,9 +49,9 @@ class WeatherForecast:
         if response:
             data = json.loads(response.text)
             temp = data['main']['temp']
-            clouds = data['clouds']['all']
+            descript = data['weather'][0]['description']
 
-            return WeatherData(datetime.now(), temp, clouds)
+            return WeatherData(datetime.now(), temp, descript)
         else:
             return None
 

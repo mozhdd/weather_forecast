@@ -2,16 +2,16 @@ from datetime import datetime
 
 
 class WeatherData:
-    def __init__(self, date, temp_k, clouds):
+    def __init__(self, date, temp_k, description):
         '''
         Stores necessary weather data in appropriate format
         :param date: Curent date (datetime.datetime)
         :param temp_k: Temperature in Kelvin(float)
-        :param clouds: Clouds percentage(int)
+        :param description: weather description (string)
         '''
         self.date = date
         self.temp_k = temp_k
-        self.clouds = clouds
+        self.description = description
 
     @property
     def temp_c(self):
