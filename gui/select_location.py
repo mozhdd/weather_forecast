@@ -43,13 +43,23 @@ class SelectLocationDlg(QtWidgets.QDialog):
         self.accept()
 
 
-if __name__ == '__main__':
+def open_select_location_dlg(loc_list):
     app = QtWidgets.QApplication(sys.argv)
-    ex = SelectLocationDlg(['Moscow, RU. Geo coords [55.7507, 37.6177]',
- 'Moscow, US. Geo coords [46.7324, -117.0002]',
- 'Moscow, US. Geo coords [41.3367, -75.5186]',
- 'Moscow, US. Geo coords [41.5229, -71.7415]',
- 'Moscow, US. Geo coords [35.062, -89.404]'])
+    ex = SelectLocationDlg(loc_list)
     ex.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+
+    idx = ex.idx if ex.exec_() == QtWidgets.QDialog.Accepted else None
+    # sys.exit(app.exec_())
     if ex.exec_() == QtWidgets.QDialog.Accepted:
-        print(ex.idx)
+        return ex.idx
+    else:
+        return None
+
+
+if __name__ == '__main__':
+    res = open_select_location_dlg(['Moscow, RU. Geo coords [55.7507, 37.6177]',
+                            'Moscow, US. Geo coords [46.7324, -117.0002]',
+                            'Moscow, US. Geo coords [41.3367, -75.5186]',
+                            'Moscow, US. Geo coords [41.5229, -71.7415]',
+                            'Moscow, US. Geo coords [35.062, -89.404]'])
+    print(res)

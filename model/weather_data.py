@@ -2,7 +2,7 @@ from datetime import datetime
 
 
 class WeatherData:
-    def __init__(self, date, temp_k, description):
+    def __init__(self, date, temp_k, description, city, country):
         '''
         Stores necessary weather data in appropriate format
         :param date: Curent date (datetime.datetime)
@@ -12,6 +12,15 @@ class WeatherData:
         self.date = date
         self.temp_k = temp_k
         self.description = description
+        self.city = city
+        self.country = country
+
+    def get_str_weather(self, temp_units):
+        return ', '.join((self.city,
+                          self.country,
+                          self.date_str(),
+                          self.description,
+                          str(self.temp_c) + temp_units))
 
     @property
     def temp_c(self):
