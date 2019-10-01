@@ -1,10 +1,8 @@
 import sys
 from datetime import datetime
 from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QMessageBox, \
-    QErrorMessage, QLineEdit, QLabel, QCheckBox, QRadioButton, QButtonGroup, \
-    QVBoxLayout
-from PyQt5.QtCore import QCoreApplication, pyqtSlot
-from PyQt5 import QtCore, QtWidgets
+    QLineEdit, QLabel, QRadioButton, QButtonGroup
+from PyQt5 import QtCore, QtWidgets, QtGui
 
 from gui.select_location import SelectLocationDlg
 from weather_forecast import WeatherForecast
@@ -20,7 +18,7 @@ class WeatherGui(QWidget):
 
     def _init_ui(self):
         self.setWindowTitle('Weather Forecast')
-        self.setGeometry(300, 300, 600, 400)
+        self.setGeometry(300, 300, 700, 400)
 
         city_lbl = QLabel(self)
         city_lbl.setText('City:')
@@ -42,12 +40,13 @@ class WeatherGui(QWidget):
 
         self.weather_tb = QLineEdit(self)
         self.weather_tb.move(20, 60)
-        self.weather_tb.resize(500, 40)
+        self.weather_tb.resize(600, 40)
         self.weather_tb.setDisabled(True)
+        self.weather_tb.setFont(QtGui.QFont('SansSerif', 10))
 
         self.update_btn = QPushButton('Update', self)
         self.update_btn.clicked.connect(self._on_update_forecast)
-        self.update_btn.resize(500, 40)
+        self.update_btn.resize(600, 40)
         self.update_btn.move(20, 110)
 
         self.rb_c = QRadioButton('C', self)
