@@ -1,7 +1,7 @@
 import sys
 from datetime import datetime
 from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QMessageBox, \
-    QLineEdit, QLabel, QRadioButton, QButtonGroup
+    QLineEdit, QLabel, QRadioButton, QButtonGroup, QToolTip
 from PyQt5 import QtCore, QtWidgets, QtGui
 
 from gui.select_location import SelectLocationDlg
@@ -18,25 +18,28 @@ class WeatherGui(QWidget):
 
     def _init_ui(self):
         self.setWindowTitle('Weather Forecast')
-        self.setGeometry(300, 300, 700, 400)
+        self.move(300, 300)
+        self.setFixedSize(640, 300)
 
         city_lbl = QLabel(self)
         city_lbl.setText('City:')
-        city_lbl.move(20, 10)
+        city_lbl.move(20, 12)
 
         country_lbl = QLabel(self)
         country_lbl.setText('Country:')
-        country_lbl.move(190, 10)
+        country_lbl.move(190, 12)
 
         self.city_tb = QLineEdit(self)
         self.city_tb.move(50, 10)
         self.city_tb.resize(120, 20)
         self.city_tb.setText('London')
+        self.city_tb.setToolTip("Put city's name here")
 
         self.country_tb = QLineEdit(self)
         self.country_tb.move(245, 10)
         self.country_tb.resize(120, 20)
         self.country_tb.setText('GB')
+        self.country_tb.setToolTip("2-letter country code (ISO3166)")
 
         self.weather_tb = QLineEdit(self)
         self.weather_tb.move(20, 60)
@@ -44,7 +47,7 @@ class WeatherGui(QWidget):
         self.weather_tb.setDisabled(True)
         self.weather_tb.setFont(QtGui.QFont('SansSerif', 10))
 
-        self.update_btn = QPushButton('Update', self)
+        self.update_btn = QPushButton('Search', self)
         self.update_btn.clicked.connect(self._on_update_forecast)
         self.update_btn.resize(600, 40)
         self.update_btn.move(20, 110)
