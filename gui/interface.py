@@ -1,8 +1,9 @@
 import sys
 from datetime import datetime
 from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QMessageBox, \
-    QErrorMessage, QLineEdit, QLabel
-from PyQt5.QtCore import QCoreApplication
+    QErrorMessage, QLineEdit, QLabel, QCheckBox, QRadioButton, QButtonGroup, \
+    QVBoxLayout
+from PyQt5.QtCore import QCoreApplication, pyqtSlot
 from PyQt5 import QtCore, QtWidgets
 
 from gui.select_location import SelectLocationDlg
@@ -13,10 +14,6 @@ from model.weather_data import WeatherData
 class WeatherGui(QWidget):
     def __init__(self):
         super().__init__()
-
-        self.weather_tb = None
-        self.update_btn = None
-
         self.weather_client = WeatherForecast()
         self._init_ui()
 
@@ -50,10 +47,23 @@ class WeatherGui(QWidget):
         self.update_btn = QPushButton('Update', self)
         self.update_btn.clicked.connect(self._on_update_forecast)
         self.update_btn.resize(500, 40)
-        # self.update_btn.resize(self.update_btn.sizeHint())
         self.update_btn.move(20, 110)
 
+        self.rb_c = QRadioButton('C', self)
+        self.rb_c.move(450, 10)
+        self.rb_c.setChecked(True)
+
+        self.rb_f = QRadioButton('F', self)
+        self.rb_f.move(450, 30)
+        self.button_group = QButtonGroup()
+        self.button_group.addButton(self.rb_c)
+        self.button_group.addButton(self.rb_f)
+        self.button_group.buttonClicked.connect(self._on_temp_units_change)
+
         self.show()
+
+    def _on_temp_units_change(self, btn):
+        self.weather_client.temp_units = btn.text()
 
     def _location(self):
         return self.city_tb.text().strip(), self.country_tb.text().strip()

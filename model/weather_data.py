@@ -15,17 +15,20 @@ class WeatherData:
         self.city = city
         self.country = country
 
+        self.temp_u = {'c': self.temp_c, 'f': self.temp_f}
+
     def get_str_weather(self, temp_units):
         return ', '.join((self.city,
                           self.country,
                           self.date_str(),
                           self.description,
-                          str(self.temp_c) + temp_units))
+                          str(self.temp_u[temp_units.lower()]) + temp_units))
 
     @property
     def temp_c(self):
         return int(self.temp_k - 273.15)
 
+    @property
     def temp_f(self):
         return int(9/5 * self.temp_k - 459.67)
 

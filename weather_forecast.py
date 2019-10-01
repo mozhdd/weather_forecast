@@ -29,7 +29,8 @@ class WeatherForecast:
             return True, ', '.join((self.city,
                               self.weather_data.date_str(),
                               self.weather_data.description,
-                              str(self.weather_data.temp_c) + self.temp_units))
+                              str(self.weather_data.temp_u[self.temp_units]) +
+                                    self.temp_units))
         else:
             # return False, 'Error message'
             return False, self.resp_error_msg
