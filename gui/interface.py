@@ -15,6 +15,7 @@ class WeatherGui(QWidget):
     def __init__(self):
         super().__init__()
         self.weather_client = WeatherForecast()
+        self.weather_data = None
         self._init_ui()
 
     def _init_ui(self):
@@ -64,6 +65,7 @@ class WeatherGui(QWidget):
 
     def _on_temp_units_change(self, btn):
         self.weather_client.temp_units = btn.text()
+        self.weather_tb.setText(self._prepare_str_forecast())
 
     def _location(self):
         return self.city_tb.text().strip(), self.country_tb.text().strip()
@@ -93,11 +95,13 @@ class WeatherGui(QWidget):
                 ex.setAttribute(QtCore.Qt.WA_DeleteOnClose)
                 idx = ex.idx if ex.exec_() == QtWidgets.QDialog.Accepted else\
                     None
-
-                self.weather_data = self._parse_weather_data(data['list'][idx])
+                if idx:
+                    self.weather_data = self._parse_weather_data(
+                        data['list'][idx])
 
             self.weather_tb.setText(self._prepare_str_forecast())
-            self.country_tb.setText(self.weather_data.country)
+            if self.weather_data:
+                self.country_tb.setText(self.weather_data.country)
 
     def _parse_weather_data(self, data):
         temp = data['main']['temp']
