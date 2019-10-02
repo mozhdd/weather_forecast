@@ -2,19 +2,17 @@ from datetime import datetime
 
 
 class WeatherData:
-    def __init__(self, date, temp_k, description, city, country, city_id):
+    def __init__(self, data):
         '''
-        Stores necessary weather data in appropriate format
-        :param date: Curent date (datetime.datetime)
-        :param temp_k: Temperature in Kelvin(float)
-        :param description: weather description (string)
+        :param data: dict of weather forecast response data
         '''
-        self.date = date
-        self.temp_k = temp_k
-        self.description = description
-        self.city = city
-        self.country = country
-        self.city_id = city_id
+        self.data = data
+        self.date = datetime.now()
+        self.temp_k = data['main']['temp']
+        self.description = data['weather'][0]['description']
+        self.city = data['name']
+        self.country = data['sys']['country']
+        self.city_id = data['id']
 
         self.temp_u = {'c': self.temp_c, 'f': self.temp_f}
 

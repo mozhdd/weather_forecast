@@ -93,7 +93,7 @@ class WeatherGui(QWidget):
             if data['count'] == 0:
                 QMessageBox.critical(self, 'Error', 'Error: City not found')
             elif data['count'] == 1:
-                self.weather_data = self._parse_weather_data(data['list'][0])
+                self.weather_data = WeatherData(data['list'][0])
             else:
                 locations = ['{0}, {1}. Geo coords {2}'.format(
                     loc['name'], loc['sys']['country'],
@@ -104,8 +104,7 @@ class WeatherGui(QWidget):
                 idx = ex.idx if ex.exec_() == QtWidgets.QDialog.Accepted else\
                     None
                 if idx is not None:
-                    self.weather_data = self._parse_weather_data(
-                        data['list'][idx])
+                    self.weather_data = WeatherData(data['list'][idx])
 
             self.weather_tb.setText(self._prepare_str_forecast())
             if self.weather_data:
@@ -116,20 +115,10 @@ class WeatherGui(QWidget):
             data = self.weather_client.forecast_by_id(
                 self.weather_data.city_id)
             if data['ok']:
-                self.weather_data = self._parse_weather_data(data)
+                self.weather_data = WeatherData(data)
                 self.weather_tb.setText(self._prepare_str_forecast())
             else:
                 QMessageBox.critical(self, 'Error', 'Error: '+data['message'])
-
-    def _parse_weather_data(self, data):
-        temp = data['main']['temp']
-        descript = data['weather'][0]['description']
-        city = data['name']
-        country = data['sys']['country']
-        city_id = data['id']
-
-        return WeatherData(datetime.now(), temp, descript, city, country,
-                           city_id)
 
     def _prepare_str_forecast(self):
         if self.weather_data:
