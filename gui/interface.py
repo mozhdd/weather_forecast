@@ -77,17 +77,18 @@ class WeatherGui(QWidget):
     def _location(self):
         return self.city_tb.text().strip(), self.country_tb.text().strip()
 
-    def _on_update_forecast_old(self):
-        ok, fcast_mess = self.weather_client.get_forecast(*self._location())
-        if ok:
-            self.weather_tb.setText(fcast_mess)
-        else:
-            QMessageBox.critical(self, 'Error', 'Error: ' + fcast_mess)
+    # def _on_update_forecast_old(self):
+    #     fcast_data = self.weather_client.forecast_by_name(*self._location())
+    #     if fcast_data['ok']:
+    #         self.weather_tb.setText(fcast_data)
+    #     else:
+    #         QMessageBox.critical(
+    #             self, 'Error', 'Error: ' + fcast_data['message'])
 
     def _on_find_forecast(self):
-        ok, data = self.weather_client.find_request(*self._location())
-        if not ok:
-            QMessageBox.critical(self, 'Error', 'Error: ' + data)
+        data = self.weather_client.forecast_from_find_request(*self._location())
+        if not data['ok']:
+            QMessageBox.critical(self, 'Error', 'Error: ' + data['message'])
         else:
             if data['count'] == 0:
                 QMessageBox.critical(self, 'Error', 'Error: City not found')
@@ -112,13 +113,13 @@ class WeatherGui(QWidget):
 
     def _on_update_forecast(self):
         if self.weather_data:
-            ok, data = self.weather_client.get_forecast_by_id(
+            data = self.weather_client.forecast_by_id(
                 self.weather_data.city_id)
-            if ok:
+            if data['ok']:
                 self.weather_data = self._parse_weather_data(data)
                 self.weather_tb.setText(self._prepare_str_forecast())
             else:
-                QMessageBox.critical(self, 'Error', 'Error: ' + data)
+                QMessageBox.critical(self, 'Error', 'Error: '+data['message'])
 
     def _parse_weather_data(self, data):
         temp = data['main']['temp']

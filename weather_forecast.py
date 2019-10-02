@@ -12,53 +12,29 @@ class WeatherForecast:
         self.weather_data = None
         self.temp_units = 'C'
         self.resp_error_msg = ''
+        self.req_timeout = (10, 10)
 
-    def get_forecast(self, city, country):
-        '''
-        :return: Response success (bool), and string message
-        Weather forecast in string format:
-        '<City>, <Date>, <Description>, <Temperature>'
-        '''
+    def forecast_by_name(self, city, country):
+        self.set_location(city, country)
+        response = self._http_request(self._url(method='weather'))
 
-        self.city = city
-        self.country = country
+        return self._parse_data_from_response(response)
 
-        self.weather_data = self._parse_data_from_weather_request()
-
-        if self.weather_data:
-            return True, ', '.join((self.city,
-                              self.weather_data.date_str(),
-                              self.weather_data.description,
-                              str(self.weather_data.temp_u[self.temp_units]) +
-                                    self.temp_units))
-        else:
-            # return False, 'Error message'
-            return False, self.resp_error_msg
-
-    def get_forecast_by_id(self, city_id):
+    def forecast_by_id(self, city_id):
         response = self._http_request(self._url(method='weather', id=city_id))
-        data = self._parse_data_from_request(response)
-        if data:
-            return True, data
-        else:
-            return False, self.resp_error_msg
 
-    def find_request(self, city, country):
+        return self._parse_data_from_response(response)
+
+    def forecast_from_find_request(self, city, country):
         self.set_location(city, country)
         response = self._http_request(self._url(method='find'))
-        data = self._parse_data_from_request(response)
-        if data:
-            return True, data
-        else:
-            return False, self.resp_error_msg
+
+        return self._parse_data_from_response(response)
 
     def set_location(self, city, country):
         # TODO: Check names here
         self.city = city
         self.country = country
-
-    def _set_temp_units(self):
-        pass
 
     def _url(self, method='weather', id=None):
         '''
@@ -79,7 +55,7 @@ class WeatherForecast:
 
     def _http_request(self, url):
         try:
-            return requests.get(url, stream=True, timeout=(10, 10))
+            return requests.get(url, stream=True, timeout=self.req_timeout)
         except requests.exceptions.ConnectTimeout:
             self.resp_error_msg = 'Connection timeout occurred! ' \
                                   'Please try later.'
@@ -113,20 +89,36 @@ class WeatherForecast:
         else:
             return None
 
-    def _parse_data_from_request(self, response):
-        # FIXME: Remove this code duplication!!!
+    def _parse_data_from_response(self, response):
+        '''
+        :return: dict: {'ok': request validity,
+                        'message': string responce message,
+                        keys with data if request is ok}
+        '''
         if response is not None:
             data = json.loads(response.text)
             if response.ok:
+                data['ok'] = True
                 return data
             else:
-                self.resp_error_msg = 'City not found'
-                return None
+                # self.resp_error_msg = 'City not found'
+                data['ok'] = False  # Set 'ok' flag if forecast is valid
+                return data
         else:
-            return None
+            data = {'ok': False,
+                    'message':  'Request failed. ' + self.resp_error_msg}
+            return data
 
 
 if __name__ == '__main__':
     wf = WeatherForecast()
-    # res = wf.find_request('London', '')
-    res = wf.get_forecast_by_id(524901)
+    res = wf.forecast_by_name('asdfg13', '')
+    res = wf.forecast_by_name('London', 'UK')
+
+    res = wf.forecast_by_id(524901)
+    res = wf.forecast_by_id(10)
+    res = wf.forecast_by_id('asfsdf')
+
+    res = wf.forecast_from_find_request('London', 'UK')
+    res = wf.forecast_from_find_request('London', '')
+    res = wf.forecast_from_find_request('Moscow', 'QW')
