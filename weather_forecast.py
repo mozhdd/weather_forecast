@@ -35,6 +35,23 @@ class WeatherForecast:
             # return False, 'Error message'
             return False, self.resp_error_msg
 
+    def get_forecast_by_id(self, city_id):
+        response = self._http_request(self._url(method='weather', id=city_id))
+        data = self._parse_data_from_request(response)
+        if data:
+            return True, data
+        else:
+            return False, self.resp_error_msg
+
+    def find_request(self, city, country):
+        self.set_location(city, country)
+        response = self._http_request(self._url(method='find'))
+        data = self._parse_data_from_request(response)
+        if data:
+            return True, data
+        else:
+            return False, self.resp_error_msg
+
     def set_location(self, city, country):
         # TODO: Check names here
         self.city = city
@@ -43,7 +60,7 @@ class WeatherForecast:
     def _set_temp_units(self):
         pass
 
-    def _url(self, method='weather'):
+    def _url(self, method='weather', id=None):
         '''
         :param method: 'weather' returns forecast in one location
         'find' returns result of search cities with same names with different
@@ -51,11 +68,14 @@ class WeatherForecast:
         :return: url string
         '''
         country = ','+self.country if self.country else self.country
-        return r'http://api.openweathermap.org/data/2.5/{method}?q={city}' \
-               r'{country}&appid=' \
-               r'332aff71953e43412a946ab10190bc7a'.format(method=method,
-                                                          city=self.city,
-                                                          country=country)
+        if id is None:
+            query = 'q={city}{country}'.format(city=self.city, country=country)
+        else:
+            query = 'id={0}'.format(str(id))
+
+        return r'http://api.openweathermap.org/data/2.5/{method}?{query}' \
+               r'&appid=332aff71953e43412a946ab10190bc7a'.format(method=method,
+                                                                 query=query)
 
     def _http_request(self, url):
         try:
@@ -84,16 +104,17 @@ class WeatherForecast:
             if response.ok:
                 temp = data['main']['temp']
                 descript = data['weather'][0]['description']
+                cid = data['id']
                 return WeatherData(datetime.now(), temp, descript,
-                                   self.city, self.country)
+                                   self.city, self.country, cid)
             else:
                 self.resp_error_msg = data['message']
                 return None
         else:
             return None
 
-    def _parse_data_from_find_request(self):
-        response = self._http_request(self._url(method='find'))
+    def _parse_data_from_request(self, response):
+        # FIXME: Remove this code duplication!!!
         if response is not None:
             data = json.loads(response.text)
             if response.ok:
@@ -104,15 +125,8 @@ class WeatherForecast:
         else:
             return None
 
-    def find_request(self, city, country):
-        self.set_location(city, country)
-        find_data = self._parse_data_from_find_request()
-        if find_data:
-            return True, find_data
-        else:
-            return False, self.resp_error_msg
-
 
 if __name__ == '__main__':
     wf = WeatherForecast()
-    res = wf.find_request('London', '')
+    # res = wf.find_request('London', '')
+    res = wf.get_forecast_by_id(524901)

@@ -42,15 +42,20 @@ class WeatherGui(QWidget):
         self.country_tb.setToolTip("2-letter country code (ISO3166)")
 
         self.weather_tb = QLineEdit(self)
-        self.weather_tb.move(20, 60)
-        self.weather_tb.resize(600, 40)
+        self.weather_tb.move(20, 90)
+        self.weather_tb.resize(600, 50)
         self.weather_tb.setDisabled(True)
         self.weather_tb.setFont(QtGui.QFont('SansSerif', 10))
 
-        self.update_btn = QPushButton('Search', self)
+        self.update_btn = QPushButton('Update', self)
         self.update_btn.clicked.connect(self._on_update_forecast)
-        self.update_btn.resize(600, 40)
-        self.update_btn.move(20, 110)
+        self.update_btn.resize(345, 25)
+        self.update_btn.move(20, 40)
+
+        self.search_btn = QPushButton('Search', self)
+        self.search_btn.clicked.connect(self._on_find_forecast)
+        self.search_btn.resize(600, 40)
+        self.search_btn.move(20, 150)
 
         self.rb_c = QRadioButton('C', self)
         self.rb_c.move(450, 10)
@@ -79,7 +84,7 @@ class WeatherGui(QWidget):
         else:
             QMessageBox.critical(self, 'Error', 'Error: ' + fcast_mess)
 
-    def _on_update_forecast(self):
+    def _on_find_forecast(self):
         ok, data = self.weather_client.find_request(*self._location())
         if not ok:
             QMessageBox.critical(self, 'Error', 'Error: ' + data)
@@ -97,7 +102,7 @@ class WeatherGui(QWidget):
                 ex.setAttribute(QtCore.Qt.WA_DeleteOnClose)
                 idx = ex.idx if ex.exec_() == QtWidgets.QDialog.Accepted else\
                     None
-                if idx:
+                if idx is not None:
                     self.weather_data = self._parse_weather_data(
                         data['list'][idx])
 
@@ -105,13 +110,25 @@ class WeatherGui(QWidget):
             if self.weather_data:
                 self.country_tb.setText(self.weather_data.country)
 
+    def _on_update_forecast(self):
+        if self.weather_data:
+            ok, data = self.weather_client.get_forecast_by_id(
+                self.weather_data.city_id)
+            if ok:
+                self.weather_data = self._parse_weather_data(data)
+                self.weather_tb.setText(self._prepare_str_forecast())
+            else:
+                QMessageBox.critical(self, 'Error', 'Error: ' + data)
+
     def _parse_weather_data(self, data):
         temp = data['main']['temp']
         descript = data['weather'][0]['description']
         city = data['name']
         country = data['sys']['country']
+        city_id = data['id']
 
-        return WeatherData(datetime.now(), temp, descript, city, country)
+        return WeatherData(datetime.now(), temp, descript, city, country,
+                           city_id)
 
     def _prepare_str_forecast(self):
         if self.weather_data:
