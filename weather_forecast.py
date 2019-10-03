@@ -92,13 +92,14 @@ class WeatherForecast:
 
 if __name__ == '__main__':
     wf = WeatherForecast()
-    res = wf.forecast_by_name('asdfg13', '')
-    res = wf.forecast_by_name('London', 'UK')
+    data = wf.forecast_by_name('asdfg13', '')
+    data = wf.forecast_by_name('London', 'GB')
+    data = wf.forecast_by_name('London', '')
 
-    res = wf.forecast_by_id(524901)
-    res = wf.forecast_by_id(10)
-    res = wf.forecast_by_id('asfsdf')
+    data = wf.forecast_by_id(524901)
+    data = wf.forecast_by_id(10)
+    data = wf.forecast_by_id('asfsdf')
 
-    res = wf.forecast_from_find_request('London', 'UK')
-    res = wf.forecast_from_find_request('London', '')
-    res = wf.forecast_from_find_request('Moscow', 'QW')
+    data = wf.forecast_from_find_request('London', 'GB')
+    data = wf.forecast_from_find_request('London', '')
+    data = wf.forecast_from_find_request('Moscow', 'QW')
