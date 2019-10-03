@@ -52,13 +52,13 @@ class WeatherGui(QWidget):
         self.weather_tb.setDisabled(True)
         self.weather_tb.setFont(QtGui.QFont('SansSerif', 10))
 
-        self.update_btn = QPushButton('Update', self)
-        self.update_btn.clicked.connect(self._on_update_forecast)
-        self.update_btn.resize(345, 25)
+        self.update_btn = QPushButton('Search', self)
+        self.update_btn.clicked.connect(self._on_find_forecast)
+        self.update_btn.resize(345, 30)
         self.update_btn.move(20, 40)
 
-        self.search_btn = QPushButton('Search', self)
-        self.search_btn.clicked.connect(self._on_find_forecast)
+        self.search_btn = QPushButton('Update', self)
+        self.search_btn.clicked.connect(self._on_update_forecast)
         self.search_btn.resize(600, 40)
         self.search_btn.move(20, 150)
 

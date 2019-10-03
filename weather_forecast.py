@@ -6,7 +6,6 @@ class WeatherForecast:
     def __init__(self):
         self.city = 'London'
         self.country = 'GB'
-        self.weather_data = None
         self.temp_units = 'C'
         self.resp_error_msg = ''
         self.req_timeout = (10, 10)
@@ -82,7 +81,7 @@ class WeatherForecast:
                 data['ok'] = True
                 return data
             else:
-                # self.resp_error_msg = 'City not found'
+                # Mostly 'City not found'
                 data['ok'] = False  # Set 'ok' flag if forecast is valid
                 return data
         else:
