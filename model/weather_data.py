@@ -25,11 +25,11 @@ class WeatherData:
 
     @property
     def temp_c(self):
-        return int(self.temp_k - 273.15)
+        return round(self.temp_k - 273.15)
 
     @property
     def temp_f(self):
-        return int(9/5 * self.temp_k - 459.67)
+        return round(9/5 * self.temp_k - 459.67)
 
     def date_str(self, fmt="%a %d %b %Y %H:%M"):
         '''

@@ -75,17 +75,17 @@ class WeatherGui(QWidget):
 
         self.show()
 
-    # def closeEvent(self, event):
-    #     quit_msg = "Are you sure you want to exit?"
-    #     reply = QMessageBox.question(self, 'Message', quit_msg,
-    #                                  QMessageBox.Yes, QMessageBox.No)
-    #
-    #     if reply == QMessageBox.Yes:
-    #         if self.timer:
-    #             self.timer.stop()
-    #         event.accept()
-    #     else:
-    #         event.ignore()
+    def closeEvent(self, event):
+        quit_msg = "Are you sure you want to exit?"
+        reply = QMessageBox.question(self, 'Message', quit_msg,
+                                     QMessageBox.Yes, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            if self.timer:
+                self.timer.stop()
+            event.accept()
+        else:
+            event.ignore()
 
     def _on_temp_units_change(self, btn):
         self.weather_client.temp_units = btn.text()
@@ -121,7 +121,6 @@ class WeatherGui(QWidget):
                 self._start_autoupdate()
 
     def _on_update_forecast(self):
-
         if self.weather_data:
             data = self.weather_client.forecast_by_id(
                 self.weather_data.city_id)

@@ -1,8 +1,5 @@
 import requests
 import json
-from datetime import datetime
-
-from model.weather_data import WeatherData
 
 
 class WeatherForecast:
@@ -71,22 +68,6 @@ class WeatherForecast:
             return None
         except Exception as e:
             self.resp_error_msg = e
-            return None
-
-    def _parse_data_from_weather_request(self):
-        response = self._http_request(self._url())
-        if response is not None:
-            data = json.loads(response.text)
-            if response.ok:
-                temp = data['main']['temp']
-                descript = data['weather'][0]['description']
-                cid = data['id']
-                return WeatherData(datetime.now(), temp, descript,
-                                   self.city, self.country, cid)
-            else:
-                self.resp_error_msg = data['message']
-                return None
-        else:
             return None
 
     def _parse_data_from_response(self, response):
