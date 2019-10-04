@@ -93,7 +93,7 @@ class WeatherForecast:
 
 
 if __name__ == '__main__':
-    wf = WeatherForecast()
+    wf = WeatherForecast(open('key.txt', 'r').read())
     data = wf.forecast_by_name('asdfg13', '')
     data = wf.forecast_by_name('London', 'GB')
     data = wf.forecast_by_name('London', '')

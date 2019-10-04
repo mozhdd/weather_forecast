@@ -5,7 +5,7 @@ from weather_forecast import WeatherForecast
 class TestWeatherForecast(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(TestWeatherForecast, self).__init__(*args, **kwargs)
-        self.wf = WeatherForecast()
+        self.wf = WeatherForecast(open('..\..\key.txt', 'r').read())
 
     def _subtest_ok(self, data, name, country, city_id):
         self.assertEqual(data['name'], name)

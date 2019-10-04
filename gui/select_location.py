@@ -7,7 +7,7 @@ class SelectLocationDlg(QtWidgets.QDialog):
     def __init__(self, locations):
         super().__init__()
         self.idx = None
-        self.locations = locations
+        self.locations = locations  # list of strings with location data
         self.init_ui()
 
     def init_ui(self):

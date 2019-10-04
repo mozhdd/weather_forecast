@@ -55,6 +55,7 @@ class WeatherGui(QMainWindow):
         self.country_tb.setText('GB')
         self.country_tb.setToolTip("2-letter country code (ISO3166)")
 
+        # Use for output
         self.weather_tb = QLineEdit(self)
         self.weather_tb.move(20, 120)
         self.weather_tb.resize(600, 50)
@@ -71,10 +72,10 @@ class WeatherGui(QMainWindow):
         self.search_btn.resize(600, 40)
         self.search_btn.move(20, 180)
 
+        # Temperature units switch
         self.rb_c = QRadioButton('C', self)
         self.rb_c.move(450, 40)
         self.rb_c.setChecked(True)
-
         self.rb_f = QRadioButton('F', self)
         self.rb_f.move(450, 60)
         self.button_group = QButtonGroup()
@@ -138,6 +139,8 @@ class WeatherGui(QMainWindow):
             elif data['count'] == 1:
                 self.weather_data = WeatherData(data['list'][0])
             else:
+                # If many responses correspond to single request, open dialog
+                # and select necessary location
                 locations = ['{0}, {1}. Geo coords {2}'.format(
                     loc['name'], loc['sys']['country'],
                     str(list(loc['coord'].values()))) for loc in data['list']]
@@ -173,6 +176,11 @@ class WeatherGui(QMainWindow):
             return ''
 
     def _start_autoupdate(self):
+        '''
+        Run thread that executes target function periodically.
+        '''
+        if self.timer:
+            self.timer.stop()
         self.timer = PeriodicExecutor(interval_sec=self.update_time_sec,
                                       execute=self._on_update_forecast)
         self.timer.start()

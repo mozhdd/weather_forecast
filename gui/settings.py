@@ -42,8 +42,6 @@ class SettingsUI(QtWidgets.QDialog):
         # button box
         self.button_box = QtWidgets.QDialogButtonBox(self)
         self.button_box.setEnabled(True)
-        # self.button_box.setGeometry(QRect(10, 60, 435, 30))
-        # self.button_box.setOrientation(Qt.Horizontal)
         self.button_box.setStandardButtons(
             QtWidgets.QDialogButtonBox.Cancel |
             QtWidgets.QDialogButtonBox.Ok)
