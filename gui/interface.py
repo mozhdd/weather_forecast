@@ -1,8 +1,10 @@
+import os
 import sys
 from datetime import datetime
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QApplication, QMessageBox, \
     QLineEdit, QLabel, QRadioButton, QButtonGroup, QToolTip, QAction, qApp
 from PyQt5 import QtCore, QtWidgets, QtGui
+import configparser
 
 
 from gui.select_location import SelectLocationDlg
@@ -13,9 +15,12 @@ from gui.settings import SettingsUI
 
 
 class WeatherGui(QMainWindow):
-    def __init__(self):
+    def __init__(self, config_file):
         super().__init__()
-        self.weather_client = WeatherForecast()
+
+        self.config = configparser.ConfigParser()
+        self.config.read(config_file)
+        self.weather_client = WeatherForecast(self._read_key())
         self.weather_data = None
         self.timer = None
         self.update_time_sec = 30 * 60
@@ -78,6 +83,20 @@ class WeatherGui(QMainWindow):
         self.button_group.buttonClicked.connect(self._on_temp_units_change)
 
         self.show()
+
+    def _read_key(self):
+        section = 'Weather Api'
+        if section in self.config and 'key' in self.config[section] and \
+                os.path.exists(self.config[section]['key']):
+            with open(self.config[section]['key'], 'r') as f:
+                key = f.read()
+                return key
+        else:
+            QMessageBox.critical(self, 'Error', 'Api key is not valid! '
+                                                'Be sure "key.txt" exists in '
+                                                'you project directory and '
+                                                'saved correctly.')
+            exit()
 
     def _init_menu_bar(self):
 
@@ -174,5 +193,5 @@ class WeatherGui(QMainWindow):
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
-    ex = WeatherGui()
+    ex = WeatherGui('weather_config.ini')
     sys.exit(app.exec_())

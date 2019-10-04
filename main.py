@@ -7,5 +7,6 @@ from gui.interface import WeatherGui
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
-    ex = WeatherGui()
+    config = r'weather_config.ini'
+    ex = WeatherGui(config)
     sys.exit(app.exec_())

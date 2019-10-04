@@ -3,7 +3,8 @@ import json
 
 
 class WeatherForecast:
-    def __init__(self):
+    def __init__(self, appid):
+        self.appid = appid
         self.city = 'London'
         self.country = 'GB'
         self.temp_units = 'C'
@@ -46,8 +47,9 @@ class WeatherForecast:
             query = 'id={0}'.format(str(id))
 
         return r'http://api.openweathermap.org/data/2.5/{method}?{query}' \
-               r'&appid=332aff71953e43412a946ab10190bc7a'.format(method=method,
-                                                                 query=query)
+               r'&appid={appid}'.format(method=method,
+                                        query=query,
+                                        appid=self.appid)
 
     def _http_request(self, url):
         try:
