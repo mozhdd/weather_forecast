@@ -1,7 +1,7 @@
 import sys
 from datetime import datetime
-from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QMessageBox, \
-    QLineEdit, QLabel, QRadioButton, QButtonGroup, QToolTip
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QApplication, QMessageBox, \
+    QLineEdit, QLabel, QRadioButton, QButtonGroup, QToolTip, QAction, qApp
 from PyQt5 import QtCore, QtWidgets, QtGui
 
 
@@ -9,15 +9,17 @@ from gui.select_location import SelectLocationDlg
 from weather_forecast import WeatherForecast
 from model.weather_data import WeatherData
 from updates_handler import PeriodicExecutor
+from gui.settings import SettingsUI
 
 
-class WeatherGui(QWidget):
+class WeatherGui(QMainWindow):
     def __init__(self):
         super().__init__()
         self.weather_client = WeatherForecast()
         self.weather_data = None
         self.timer = None
         self.update_time_sec = 30 * 60
+        self.settings = None
 
         self._init_ui()
 
@@ -26,28 +28,30 @@ class WeatherGui(QWidget):
         self.move(300, 300)
         self.setFixedSize(640, 300)
 
+        self._init_menu_bar()
+
         city_lbl = QLabel(self)
         city_lbl.setText('City:')
-        city_lbl.move(20, 12)
+        city_lbl.move(20, 42)
 
         country_lbl = QLabel(self)
         country_lbl.setText('Country:')
-        country_lbl.move(190, 12)
+        country_lbl.move(190, 42)
 
         self.city_tb = QLineEdit(self)
-        self.city_tb.move(50, 10)
+        self.city_tb.move(50, 40)
         self.city_tb.resize(120, 20)
         self.city_tb.setText('London')
         self.city_tb.setToolTip("Put city's name here")
 
         self.country_tb = QLineEdit(self)
-        self.country_tb.move(245, 10)
+        self.country_tb.move(245, 40)
         self.country_tb.resize(120, 20)
         self.country_tb.setText('GB')
         self.country_tb.setToolTip("2-letter country code (ISO3166)")
 
         self.weather_tb = QLineEdit(self)
-        self.weather_tb.move(20, 90)
+        self.weather_tb.move(20, 120)
         self.weather_tb.resize(600, 50)
         self.weather_tb.setDisabled(True)
         self.weather_tb.setFont(QtGui.QFont('SansSerif', 10))
@@ -55,19 +59,19 @@ class WeatherGui(QWidget):
         self.update_btn = QPushButton('Search', self)
         self.update_btn.clicked.connect(self._on_find_forecast)
         self.update_btn.resize(345, 30)
-        self.update_btn.move(20, 40)
+        self.update_btn.move(20, 70)
 
         self.search_btn = QPushButton('Update', self)
         self.search_btn.clicked.connect(self._on_update_forecast)
         self.search_btn.resize(600, 40)
-        self.search_btn.move(20, 150)
+        self.search_btn.move(20, 180)
 
         self.rb_c = QRadioButton('C', self)
-        self.rb_c.move(450, 10)
+        self.rb_c.move(450, 40)
         self.rb_c.setChecked(True)
 
         self.rb_f = QRadioButton('F', self)
-        self.rb_f.move(450, 30)
+        self.rb_f.move(450, 60)
         self.button_group = QButtonGroup()
         self.button_group.addButton(self.rb_c)
         self.button_group.addButton(self.rb_f)
@@ -75,6 +79,17 @@ class WeatherGui(QWidget):
 
         self.show()
 
+    def _init_menu_bar(self):
+
+        settins_action = QAction(QtGui.QIcon('settings.png'), '&Settings', self)
+        settins_action.setShortcut('Ctrl+S')
+        settins_action.triggered.connect(self._on_settings_set)
+
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('&File')
+        fileMenu.addAction(settins_action)
+
+    # Override base event method
     def closeEvent(self, event):
         quit_msg = "Are you sure you want to exit?"
         reply = QMessageBox.question(self, 'Message', quit_msg,
@@ -142,6 +157,18 @@ class WeatherGui(QWidget):
         self.timer = PeriodicExecutor(interval_sec=self.update_time_sec,
                                       execute=self._on_update_forecast)
         self.timer.start()
+
+    def _on_settings_set(self):
+        ex = SettingsUI(self.update_time_sec)
+        ex.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+
+        settings = ex.settings if \
+            ex.exec_() == QtWidgets.QDialog.Accepted else None
+
+        # FIXME: Hardcode. Replace every settings filed with Settings object
+        if settings:
+            self.update_time_sec = settings.update_time_sec
+            self._start_autoupdate()
 
 
 if __name__ == '__main__':
